@@ -12,23 +12,23 @@ podman compose -f podman-compose.yml up --build -d
 
 ## Step 1: Setup Git MCP connection
 1. Go to Github website of your personal account and go to settings menu as shown in the image below.
-![image](ecommerce-microservices/get_start_assets/image.png)
+![image](get_start_assets/image.png)
 
 2. Click on `Developer settings` and then `Personal access tokens`.
-![image](ecommerce-microservices/get_start_assets/image2.png)
+![image](get_start_assets/image2.png)
 
 3. Click on `Tokens (classic)` and then `Generate new token` and then `Generate token classic` to get your personal access token. Verify your identity.
-![image](ecommerce-microservices/get_start_assets/image3.png)
+![image](get_start_assets/image3.png)
 
 4. Tick all the scope on the screen to give all permission to your token. Then click on `Generate token` button.
-![image](ecommerce-microservices/get_start_assets/image4.png)
+![image](get_start_assets/image4.png)
 
 5. You will have something like image below. Copy the token and save it in a safe place.
-![image](ecommerce-microservices/get_start_assets/image5.png)
+![image](get_start_assets/image5.png)
 
 6. Go back to Bob and click on settings menu. Go on MCP menu. Then click on `Open` of Global settings.
-![image](ecommerce-microservices/get_start_assets/image6.png)
-![image](ecommerce-microservices/get_start_assets/image7.png)
+![image](get_start_assets/image6.png)
+![image](get_start_assets/image7.png)
 
 7. Paste the snippet below by replacing your Github token first. Then save the json MCP file that you edited. 
 
@@ -61,7 +61,7 @@ podman compose -f podman-compose.yml up --build -d
 
 ## Step 1: Setup project
 1. Go to Github menu and click create project as shown in image below.
-![image](ecommerce-microservices/get_start_assets/project_setup/image.png)
+![image](get_start_assets/project_setup/image.png)
 
 2. Click green button `New Project`
 3. Select `Kanban` template.
@@ -73,13 +73,13 @@ podman compose -f podman-compose.yml up --build -d
 ## Step 3: Fix performance issue of created API
 1. Create an issue in Backlog by clicking `+ Add Item` button.
 2. Type `Performance Issue of Check Stock Before Made Order API` and click `Create new issue` then click `Blank issue`.
-3. Upload the image from path `ecommerce-microservices/get_start_assets/project_setup/example_graph.png` into the issue page.
+3. Upload the image from path `get_start_assets/project_setup/example_graph.png` into the issue page.
 4. Copy below description and paste it to the issue page too.
 ```
 The API on Shipping Service is called in the volume that exceed the estimated value. The CPU usage is 100% and it is causing the performance issue. Please find workaround method that fast and easy to implement to fix this issue as soon as possible.
 ```
 5. Click create issue then click into that issue and click `Assign yourself`.
-![image](ecommerce-microservices/get_start_assets/project_setup/image3.png)
+![image](get_start_assets/project_setup/image3.png)
 6. Come back to Bob and switch to Advanced Mode then ask `Is there any issue assign to me?`
 7. The answer should include the issue we just created. Now, ask Bob `Help me fix the performance issue now`.
 8. Bob will create task and start fixing. Here ask Bob to edit frontend that allow us to see that the cache is working by `Edit the frontend to show the cache is working`.
