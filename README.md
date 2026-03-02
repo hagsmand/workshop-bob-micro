@@ -420,22 +420,22 @@ This project follows a **Layered Architecture** (also known as N-Tier Architectu
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        Controller[Controllers - @RestController]
+        Controller[Controllers - RestController]
     end
     
     subgraph "Application Layer"
         Service[Service Interfaces - Business Logic]
-        ServiceImpl[Service Implementations - @Service]
+        ServiceImpl[Service Implementations - Service]
         DTO[DTOs - Request/Response]
     end
     
     subgraph "Domain Layer"
-        Model[Domain Models - @Entity]
+        Model[Domain Models - Entity]
         Event[Domain Events - Event Objects]
     end
     
     subgraph "Infrastructure Layer"
-        Repository[Repositories - @Repository - JpaRepository]
+        Repository[Repositories - Repository - JpaRepository]
         Kafka[Kafka Integration - Event Publishing]
         Database[(Database - PostgreSQL/MongoDB)]
     end
@@ -666,9 +666,9 @@ sequenceDiagram
 ```mermaid
 graph LR
     subgraph "Spring Dependency Injection"
-        A[@RestController] -->|@RequiredArgsConstructor| B[Service Interface]
-        C[@Service] -->|@RequiredArgsConstructor| D[Repository]
-        C -->|@RequiredArgsConstructor| E[KafkaTemplate]
+        A[RestController] -->|RequiredArgsConstructor| B[Service Interface]
+        C[Service] -->|RequiredArgsConstructor| D[Repository]
+        C -->|RequiredArgsConstructor| E[KafkaTemplate]
         
         B -.->|Runtime Injection| C
         D -.->|Spring Data JPA| F[(Database)]
