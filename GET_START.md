@@ -73,7 +73,7 @@ n. Update documentation of API service.
 
 ## Step 3: Fix performance issue of created API
 1. Create an issue in Backlog by clicking `+ Add Item` button.
-2. Type `Performance Issue of Check Stock Before Made Order API` and click `Create new issue` then click `Blank issue`.
+2. Type `Performance Issue of Shipping API` and click `Create new issue` then click `Blank issue`.
 3. Upload the image from path `get_start_assets/project_setup/example_graph.png` into the issue page.
 4. Copy below description and paste it to the issue page too.
 ```
