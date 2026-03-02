@@ -394,7 +394,7 @@ To completely remove all containers, images, and volumes:
 
 ```bash
 # Stop and remove containers
-podman-compose -f podman-compose.yml down -v
+podman compose -f podman-compose.yml down -v
 
 # Remove all built images
 podman rmi ecommerce/common-library:latest

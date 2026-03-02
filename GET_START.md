@@ -94,7 +94,7 @@ Please also update the README and other related documentation and visualization 
 
 
 ## Step 3: Fix performance issue of created API
-1. Create an issue in Backlog by clicking `+ Add Item` button.
+1. Create an issue in Github Backlog by clicking `+ Add Item` button.
 2. Type `Performance Issue of Shipping API` and click `Create new issue` then click `Blank issue`.
 3. Upload the image from path `get_start_assets/project_setup/example_graph.png` into the issue page.
 4. Copy below description and paste it to the issue page too.
@@ -104,12 +104,13 @@ The API on Shipping Service is called in the volume that exceed the estimated va
 5. Click create issue then click into that issue and click `Assign yourself`.
 ![image](get_start_assets/project_setup/image3.png)
 6. Come back to Bob and switch to Advanced Mode then ask `Is there any issue assign to me?`
-7. The answer should include the issue we just created. Now, ask Bob `Help me fix the performance issue now`.
-8. Bob will create task and start fixing. Here ask Bob to edit frontend that allow us to see that the cache is working by `Edit the frontend to show the cache is working`.
-9. In case you face any issue go to Bob's chat and type `@terminal fix this error` and run compose up again. Remember services will not up immediately please wait a while and check on Eureka and see if the service is up and running couple times.
-10. If everything is working fine, ask Bob `/create-pr and update issue status to done` by selected main branch as our target.
-11. Bob should create PR and update issue status to done. That's it.
-
+7. The answer should include the issue we just created. Now, ask Bob `Help me fix the performance issue now` // or any answer options Bob provides that relates about caching implementation.
+8. Bob should also help edit the frontend page for the previous step. If it does skip this step. If no, ask Bob to edit frontend that allow us to see that the cache is working by `Edit the frontend to show the cache is working`.
+9. Restart the compose and check UI.
+10. In case you face any issue go to Bob's chat and type `@terminal fix this error` and run compose up again. Remember services will not up immediately please wait a while and check on Eureka and see if the service is up and running couple times.
+11. If everything is working fine, ask Bob `/create-pr and update issue status to done` by selected main branch as our target.
+12. Bob should create PR and update issue status to done. 
+13. Ask Bob to `Generate sequence diagram of this cache on the API and update on README.md`
 
 
 ## Appendix
@@ -128,10 +129,26 @@ The API on Shipping Service is called in the volume that exceed the estimated va
 - CPUs: 4-6 - For better performance
 - Disk: 100GB - Already configured
 
-# Fix command 
+# Fix command Podman machine
+```
 cd ecommerce-microservices
 podman compose -f podman-compose.yml down
 podman machine stop
 podman machine rm
 podman machine init --cpus 4 --memory 8192 --disk-size 100
 podman machine start
+```
+
+# Restart specific service
+```
+podman compose -f podman-compose.yml up --build --force-recreate mcp-frontend -d
+```
+
+# Restart Podman compose
+```
+podman compose -f podman-compose.yml down -v
+podman machine stop
+podman machine start
+podman compose -f podman-compose.yml up --build -d
+```
+
