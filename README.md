@@ -35,34 +35,34 @@ This project implements a robust e-commerce system using a microservices archite
 graph TB
     subgraph "Client Layer"
         Client[Web/Mobile Clients]
-        Frontend[MVP Frontend<br/>Port 3000]
+        Frontend[MVP Frontend - Port 3000]
     end
     
     subgraph "API Gateway Layer"
-        Gateway[API Gateway<br/>Port 8080<br/>Spring Cloud Gateway]
+        Gateway[API Gateway - Port 8080 - Spring Cloud Gateway]
     end
     
     subgraph "Service Discovery"
-        Eureka[Service Registry<br/>Port 8761<br/>Netflix Eureka]
+        Eureka[Service Registry - Port 8761 - Netflix Eureka]
     end
     
     subgraph "Microservices Layer"
-        OrderSvc[Order Service<br/>Port 8081]
-        InventorySvc[Inventory Service<br/>Port 8082]
-        PaymentSvc[Payment Service<br/>Port 8083]
-        NotificationSvc[Notification Service<br/>Port 8084]
-        ShippingSvc[Shipping Service<br/>Port 8085]
+        OrderSvc[Order Service - Port 8081]
+        InventorySvc[Inventory Service - Port 8082]
+        PaymentSvc[Payment Service - Port 8083]
+        NotificationSvc[Notification Service - Port 8084]
+        ShippingSvc[Shipping Service - Port 8085]
     end
     
     subgraph "Event Streaming"
-        Kafka[Apache Kafka<br/>Port 9092]
-        Zookeeper[Zookeeper<br/>Port 2181]
+        Kafka[Apache Kafka - Port 9092]
+        Zookeeper[Zookeeper - Port 2181]
     end
     
     subgraph "Data Layer"
-        PostgreSQL[(PostgreSQL<br/>Port 5432<br/>Order, Payment, Shipping)]
-        MongoDB[(MongoDB<br/>Port 27017<br/>Inventory, Notification)]
-        Redis[(Redis<br/>Port 6379<br/>Cache)]
+        PostgreSQL[(PostgreSQL - Port 5432 - Order/Payment/Shipping)]
+        MongoDB[(MongoDB - Port 27017 - Inventory/Notification)]
+        Redis[(Redis - Port 6379 - Cache)]
     end
     
     Client --> Frontend
@@ -363,9 +363,9 @@ graph TB
     end
     
     OrderSvc -->|OrderCreatedEvent| OrderTopic
-    InventorySvc -->|InventoryReservedEvent<br/>InventoryReservationFailedEvent| InventoryTopic
-    PaymentSvc -->|PaymentProcessedEvent<br/>PaymentFailedEvent| PaymentTopic
-    ShippingSvc -->|ShipmentProcessedEvent<br/>ShipmentFailedEvent| ShippingTopic
+    InventorySvc -->|InventoryReservedEvent / InventoryReservationFailedEvent| InventoryTopic
+    PaymentSvc -->|PaymentProcessedEvent / PaymentFailedEvent| PaymentTopic
+    ShippingSvc -->|ShipmentProcessedEvent / ShipmentFailedEvent| ShippingTopic
     
     OrderTopic -->|Subscribe| InventorySub
     OrderTopic -->|Subscribe| NotificationSub
@@ -420,24 +420,24 @@ This project follows a **Layered Architecture** (also known as N-Tier Architectu
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        Controller[Controllers<br/>@RestController]
+        Controller[Controllers - @RestController]
     end
     
     subgraph "Application Layer"
-        Service[Service Interfaces<br/>Business Logic]
-        ServiceImpl[Service Implementations<br/>@Service]
-        DTO[DTOs<br/>Request/Response]
+        Service[Service Interfaces - Business Logic]
+        ServiceImpl[Service Implementations - @Service]
+        DTO[DTOs - Request/Response]
     end
     
     subgraph "Domain Layer"
-        Model[Domain Models<br/>@Entity]
-        Event[Domain Events<br/>Event Objects]
+        Model[Domain Models - @Entity]
+        Event[Domain Events - Event Objects]
     end
     
     subgraph "Infrastructure Layer"
-        Repository[Repositories<br/>@Repository<br/>JpaRepository]
-        Kafka[Kafka Integration<br/>Event Publishing]
-        Database[(Database<br/>PostgreSQL/MongoDB)]
+        Repository[Repositories - @Repository - JpaRepository]
+        Kafka[Kafka Integration - Event Publishing]
+        Database[(Database - PostgreSQL/MongoDB)]
     end
     
     Controller -->|Uses| Service
@@ -599,14 +599,14 @@ graph TB
     subgraph "Service Package Structure"
         Root[com.hacisimsek.service-name]
         
-        Root --> Controller[controller/<br/>REST Controllers]
-        Root --> Service[service/<br/>Business Interfaces]
-        Root --> ServiceImpl[service/impl/<br/>Service Implementations]
-        Root --> Model[model/<br/>Domain Entities]
-        Root --> Repository[repository/<br/>Data Access]
-        Root --> DTO[dto/<br/>Data Transfer Objects]
-        Root --> Config[config/<br/>Configuration Classes]
-        Root --> Saga[saga/<br/>Saga Handlers]
+        Root --> Controller[controller/ REST Controllers]
+        Root --> Service[service/ Business Interfaces]
+        Root --> ServiceImpl[service/impl/ Service Implementations]
+        Root --> Model[model/ Domain Entities]
+        Root --> Repository[repository/ Data Access]
+        Root --> DTO[dto/ Data Transfer Objects]
+        Root --> Config[config/ Configuration Classes]
+        Root --> Saga[saga/ Saga Handlers]
     end
     
     Controller -.->|Uses| Service
@@ -658,7 +658,7 @@ sequenceDiagram
     Controller-->>Client: HTTP 201 Created
     deactivate Controller
     
-    Note over Kafka: Event triggers Saga flow<br/>in other services
+    Note over Kafka: Event triggers Saga flow in other services
 ```
 
 ### Dependency Injection Pattern
