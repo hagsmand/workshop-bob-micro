@@ -68,8 +68,30 @@ podman compose -f podman-compose.yml up --build -d
 4. Tick `Import items from repository` and select repository you created in step 0.
 5. If you see the Kanban board, you are good to go for this step.
 
-## Step 2: Update API service
-n. Update documentation of API service.
+## Step 2: Update API Service
+
+### 2.1 Review the GitHub Issue
+
+Check the GitHub UI — there is an open issue titled **`feat: Graceful out-of-stock handling in Saga Tracking UI`**. In this step, you will let Bob fix that issue.
+
+![GitHub Issue](get_start_assets/git-issue.png)
+
+### 2.2 Ask Bob to Fix the Issue
+
+Send the following message to Bob:
+
+```
+There is a new GitHub issues created on this project. Pull that issue, understand it, and make changes to the code according to the criteria and information in the issue. Access the issue using the existing GitHub MCP.
+```
+
+### 2.3 Update the Documentation
+
+After Bob applies the fix, send this follow-up message:
+
+```
+Please also update the README and other related documentation and visualization according to the change you just made.
+```
+
 
 ## Step 3: Fix performance issue of created API
 1. Create an issue in Backlog by clicking `+ Add Item` button.
