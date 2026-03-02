@@ -124,18 +124,9 @@ h1 {
   animation-delay: 190ms;
 }
 
-#cache-card {
-  grid-column: span 12;
-  animation-delay: 250ms;
-}
-
 #check-card {
   grid-column: span 4;
-  animation-delay: 310ms;
-}
-
-.cache-stats-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  animation-delay: 250ms;
 }
 
 h2 {

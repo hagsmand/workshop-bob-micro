@@ -3,14 +3,11 @@ package com.hacisimsek.shipping.service.impl;
 import com.hacisimsek.common.event.payment.PaymentProcessedEvent;
 import com.hacisimsek.common.event.shipping.ShipmentFailedEvent;
 import com.hacisimsek.common.event.shipping.ShipmentProcessedEvent;
-import com.hacisimsek.shipping.config.CacheConfig;
 import com.hacisimsek.shipping.model.Shipment;
 import com.hacisimsek.shipping.repository.ShipmentRepository;
 import com.hacisimsek.shipping.service.ShippingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +28,6 @@ public class ShippingServiceImpl implements ShippingService {
 
     @Override
     @Transactional
-    @CacheEvict(value = {CacheConfig.SHIPMENT_CACHE, CacheConfig.SHIPMENT_BY_ORDER_CACHE}, allEntries = true)
     public void processShipping(PaymentProcessedEvent paymentEvent) {
         log.info("Processing shipping for order: {}", paymentEvent.getOrderId());
 
@@ -88,17 +84,13 @@ public class ShippingServiceImpl implements ShippingService {
     }
 
     @Override
-    @Cacheable(value = CacheConfig.SHIPMENT_BY_ORDER_CACHE, key = "#orderId")
     public Shipment getShipmentByOrderId(UUID orderId) {
-        log.info("Fetching shipment from database for order: {}", orderId);
         return shipmentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Shipment not found for order: " + orderId));
     }
 
     @Override
-    @Cacheable(value = CacheConfig.SHIPMENT_CACHE, key = "#shipmentId")
     public Shipment getShipmentById(UUID shipmentId) {
-        log.info("Fetching shipment from database for shipment ID: {}", shipmentId);
         return shipmentRepository.findById(shipmentId)
                 .orElseThrow(() -> new RuntimeException("Shipment not found with ID: " + shipmentId));
     }
