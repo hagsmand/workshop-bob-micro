@@ -80,14 +80,17 @@ Check the GitHub UI — there is an open issue titled **`feat: Graceful out-of-s
 
 Send the following message to Bob:
 
-> There are new GitHub issues created on this project. Pull that issue, understand it, and make changes to the code according to the criteria and information in the issue. Access the issue using the existing GitHub MCP.
+```
+There is a new GitHub issues created on this project. Pull that issue, understand it, and make changes to the code according to the criteria and information in the issue. Access the issue using the existing GitHub MCP.
+```
 
 ### 2.3 Update the Documentation
 
 After Bob applies the fix, send this follow-up message:
 
-> Please also update the README and other related documentation and visualization according to the change you just made.
-
+```
+Please also update the README and other related documentation and visualization according to the change you just made.
+```
 
 
 ## Step 3: Fix performance issue of created API
