@@ -5,6 +5,7 @@ const inventoryFeedback = document.getElementById("inventory-feedback");
 const orderFeedback = document.getElementById("order-feedback");
 const flowFeedback = document.getElementById("flow-feedback");
 const availabilityFeedback = document.getElementById("availability-feedback");
+const cacheFeedback = document.getElementById("cache-feedback");
 
 const inventoryList = document.getElementById("inventory-list");
 const createdOrderCard = document.getElementById("created-order-card");
@@ -14,6 +15,9 @@ const flowPaymentView = document.getElementById("flow-payment");
 const flowShippingView = document.getElementById("flow-shipping");
 const flowNotifyOrderView = document.getElementById("flow-notify-order");
 const flowNotifyCustomerView = document.getElementById("flow-notify-customer");
+
+const cacheShipmentsView = document.getElementById("cache-shipments");
+const cacheShipmentsOrderView = document.getElementById("cache-shipments-order");
 
 const sagaOrderNode = document.getElementById("saga-order");
 const sagaInventoryNode = document.getElementById("saga-inventory");
@@ -203,6 +207,30 @@ function renderNotificationCard(element, notifications, emptyMessage) {
       ${row("Latest subject", latest.subject || "-")}
       ${row("Last sent", latest.sentAt || latest.createdAt || "-")}
     </ul>
+  `;
+}
+
+function renderCacheCard(element, cacheData, cacheName) {
+  if (!cacheData || typeof cacheData !== "object") {
+    setEmptyCard(element, "No cache data available.");
+    return;
+  }
+
+  const size = cacheData.size || 0;
+  const keys = Array.isArray(cacheData.keys) ? cacheData.keys : [];
+  const name = cacheData.name || cacheName;
+
+  element.className = "entity-card";
+  element.innerHTML = `
+    <div class="entity-head">
+      ${makeBadge(`${size} entries`, size > 0 ? "ok" : "neutral")}
+      <span class="mono">${escapeHtml(name)}</span>
+    </div>
+    <ul class="data-list">
+      ${row("Cache Size", String(size))}
+      ${row("Cached Keys", keys.length > 0 ? keys.slice(0, 3).join(", ") + (keys.length > 3 ? "..." : "") : "None")}
+    </ul>
+    ${size > 0 ? `<p class="entity-note">✓ Cache is active and reducing database load</p>` : `<p class="entity-note">⚠ Cache is empty - first requests will populate it</p>`}
   `;
 }
 
@@ -563,6 +591,46 @@ document.getElementById("availability-form").addEventListener("submit", async (e
   }
 });
 
+async function loadCacheStats() {
+  try {
+    setStatus(cacheFeedback, "neutral", "Loading cache statistics...");
+    const stats = await request("/api/shipping/cache/stats");
+    
+    if (stats.shipmentsCache) {
+      renderCacheCard(cacheShipmentsView, stats.shipmentsCache, "Shipments Cache");
+    } else {
+      setEmptyCard(cacheShipmentsView, "No shipments cache data");
+    }
+    
+    if (stats.shipmentsByOrderCache) {
+      renderCacheCard(cacheShipmentsOrderView, stats.shipmentsByOrderCache, "Shipments by Order Cache");
+    } else {
+      setEmptyCard(cacheShipmentsOrderView, "No shipments by order cache data");
+    }
+    
+    const totalEntries = (stats.shipmentsCache?.size || 0) + (stats.shipmentsByOrderCache?.size || 0);
+    setStatus(cacheFeedback, "ok", `Cache stats loaded. Total entries: ${totalEntries}`);
+  } catch (error) {
+    setStatus(cacheFeedback, "error", `Failed to load cache stats: ${parseError(error)}`);
+    setEmptyCard(cacheShipmentsView, "Cache service unavailable");
+    setEmptyCard(cacheShipmentsOrderView, "Cache service unavailable");
+  }
+}
+
+async function clearAllCaches() {
+  try {
+    setStatus(cacheFeedback, "neutral", "Clearing all caches...");
+    await request("/api/shipping/cache/clear", { method: "DELETE" });
+    setStatus(cacheFeedback, "ok", "All caches cleared successfully!");
+    await loadCacheStats();
+  } catch (error) {
+    setStatus(cacheFeedback, "error", `Failed to clear caches: ${parseError(error)}`);
+  }
+}
+
+document.getElementById("refresh-cache").addEventListener("click", loadCacheStats);
+document.getElementById("clear-cache").addEventListener("click", clearAllCaches);
+
 resetSagaLane();
 setEmptyCard(createdOrderCard, "No order created yet.");
 setEmptyCard(flowOrderView, "No data");
@@ -570,6 +638,9 @@ setEmptyCard(flowPaymentView, "No data");
 setEmptyCard(flowShippingView, "No data");
 setEmptyCard(flowNotifyOrderView, "No data");
 setEmptyCard(flowNotifyCustomerView, "No data");
+setEmptyCard(cacheShipmentsView, "No data");
+setEmptyCard(cacheShipmentsOrderView, "No data");
 
 loadInventory();
 checkGatewayHealth();
+loadCacheStats();
