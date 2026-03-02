@@ -68,7 +68,8 @@ podman compose -f podman-compose.yml up --build -d
 4. Tick `Import items from repository` and select repository you created in step 0.
 5. If you see the Kanban board, you are good to go for this step.
 
-## Step 2: Implement new API
+## Step 2: Update API service
+n. Update documentation of API service.
 
 ## Step 3: Fix performance issue of created API
 1. Create an issue in Backlog by clicking `+ Add Item` button.
