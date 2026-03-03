@@ -9,6 +9,11 @@ cd ecommerce-microservices
 podman compose -f podman-compose.yml up --build -d
 ```
 6. Go to your browser and access to Eureka at `http://localhost:8761` to check if all services are up and running.
+7. Explore the UI at `http://localhost:3000` and understand how flow works.
+7.1 Try setup inventory with quantity 1
+7.2 Try create order that comsume all the created product 
+7.3 Try tracking saga flow of this order
+7.4 Create another order on the product that you created in step 7.1. You will see that when no product left in the inventory the service will throw 500 which in not our expected result.
 
 ## Step 1: Setup Git MCP connection
 1. Go to Github website of your personal account and go to settings menu as shown in the image below.
@@ -68,20 +73,29 @@ podman compose -f podman-compose.yml up --build -d
 4. Tick `Import items from repository` and select repository you created in step 0.
 5. If you see the Kanban board, you are good to go for this step.
 
-## Step 2: Update API Service
+## Step 2 (Part 1): Update API Service
 
-### 2.1 Review the GitHub Issue
+### 2.1 Create the GitHub Issue
 
-Check the GitHub UI — there is an open issue titled **`feat: Graceful out-of-stock handling in Saga Tracking UI`**. In this step, you will let Bob fix that issue.
-
-![GitHub Issue](get_start_assets/git-issue.png)
+#### 2.1. Create an issue in Github Backlog by clicking `+ Add Item` button.
+#### 2.2. Type `Graceful out-of-stock handling in Saga Tracking UI` and click `Create new issue` then click `Blank issue`.
+#### 2.3. Copy content from path `get_start_assets/lab1_graceful_handling/issue.md` into the issue page, click create issue, and assign to yourself.
 
 ### 2.2 Ask Bob to Fix the Issue
 
 Send the following message to Bob:
 
 ```
-There is a new GitHub issues created on this project. Pull that issue, understand it, and make changes to the code according to the criteria and information in the issue. Access the issue using the existing GitHub MCP.
+There is a new GitHub issues assigned to me on the backlong. Pull that issue name "Graceful out-of-stock handling in Saga Tracking UI", understand it, and make changes to the code according to the criteria and information in the issue. Access the issue using the existing GitHub MCP.
+```
+
+Try restart all services with command:
+
+```
+podman compose -f podman-compose.yml down -v
+podman machine stop
+podman machine start
+podman compose -f podman-compose.yml up --build -d
 ```
 
 ### 2.3 Update the Documentation
@@ -93,7 +107,7 @@ Please also update the README and other related documentation and visualization 
 ```
 
 
-## Step 3: Fix performance issue of created API
+## Step 3 (Part 2): Fix performance issue of created API
 1. Create an issue in Github Backlog by clicking `+ Add Item` button.
 2. Type `Performance Issue of Shipping API` and click `Create new issue` then click `Blank issue`.
 3. Upload the image from path `get_start_assets/project_setup/example_graph.png` into the issue page.
@@ -103,7 +117,7 @@ The API on Shipping Service is called in the volume that exceed the estimated va
 ```
 5. Click create issue then click into that issue and click `Assign yourself`.
 ![image](get_start_assets/project_setup/image3.png)
-6. Come back to Bob and switch to Advanced Mode then ask `Is there any issue assign to me?`
+6. Come back to Bob, open new chat, and switch to Advanced Mode then ask `Is there any issue assign to me?`
 7. The answer should include the issue we just created. Now, ask Bob `Help me fix the performance issue now` // or any answer options Bob provides that relates about caching implementation.
 8. Bob should also help edit the frontend page for the previous step. If it does skip this step. If no, ask Bob to edit frontend that allow us to see that the cache is working by `Edit the frontend to show the cache is working`.
 9. Restart the compose and check UI.
