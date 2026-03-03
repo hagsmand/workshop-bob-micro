@@ -121,10 +121,10 @@ The API on Shipping Service is called in the volume that exceed the estimated va
 7. The answer should include the issue we just created. Now, ask Bob `Help me fix the performance issue now` // or any answer options Bob provides that relates about caching implementation.
 8. Bob should also help edit the frontend page for the previous step. If it does skip this step. If no, ask Bob to edit frontend that allow us to see that the cache is working by `Edit the frontend to show the cache is working`.
 9. Restart the compose and check UI.
-10. In case you face any issue go to Bob's chat and type `@terminal fix this error` and run compose up again. Remember services will not up immediately please wait a while and check on Eureka and see if the service is up and running couple times.
+10. In case you face any issue go to Bob's chat and type `@terminal fix this error` and restart compose again. Remember services will not up immediately please wait a while and check on Eureka and see if the service is up and running couple times.
 11. If everything is working fine, ask Bob `/create-pr and update issue status to done` by selected main branch as our target.
 12. Bob should create PR and update issue status to done. 
-13. Ask Bob to `Generate sequence diagram of this cache on the API and update on README.md`
+13. Ask Bob to `Update sequence diagram of this cache on the API and update on README.md`
 
 
 ## Appendix
