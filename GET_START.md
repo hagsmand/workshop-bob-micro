@@ -1,5 +1,5 @@
 ## Step 0: Setup Project
-1. Clone this repository.
+1. Fork this repository. Ensure it's on your account after forked.
 2. Publish it as new repo from your laptop using your **private** github account.
 3. Download podman from `https://podman.io/`. If you don't have.
 4. Go to settings of podman and setup podman machine to have at least 4 CPUs and 8 GB RAM.
