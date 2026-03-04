@@ -21,6 +21,11 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       auto-offset-reset: earliest
+  cache:
+    type: simple
+    cache-names:
+      - shipments
+      - shipmentsByOrder
 
 eureka:
   client:

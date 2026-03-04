@@ -146,6 +146,22 @@ function renderPaymentCard(element, payment) {
     return;
   }
 
+  // Handle NOT_APPLICABLE status
+  if (payment.status === "NOT_APPLICABLE") {
+    element.className = "entity-card";
+    element.innerHTML = `
+      <div class="entity-head">
+        <strong>Payment Service</strong>
+        ${makeBadge("NOT APPLICABLE", "neutral")}
+      </div>
+      <ul class="data-list">
+        ${row("Order", payment.orderId, true)}
+        ${row("Message", payment.message || "-")}
+      </ul>
+    `;
+    return;
+  }
+
   element.className = "entity-card";
   element.innerHTML = `
     <div class="entity-head">
@@ -164,6 +180,22 @@ function renderPaymentCard(element, payment) {
 function renderShippingCard(element, shipment) {
   if (!shipment || typeof shipment !== "object") {
     setEmptyCard(element, "No shipment data yet.");
+    return;
+  }
+
+  // Handle NOT_APPLICABLE status
+  if (shipment.status === "NOT_APPLICABLE") {
+    element.className = "entity-card";
+    element.innerHTML = `
+      <div class="entity-head">
+        <strong>Shipping Service</strong>
+        ${makeBadge("NOT APPLICABLE", "neutral")}
+      </div>
+      <ul class="data-list">
+        ${row("Order", shipment.orderId, true)}
+        ${row("Message", shipment.message || "-")}
+      </ul>
+    `;
     return;
   }
 
@@ -228,6 +260,10 @@ function updateSagaLane(orderResult, paymentResult, shippingResult, notifyOrderR
   const shipping = shippingResult.status === "fulfilled" ? shippingResult.value : null;
   const orderStatus = String(order?.status || "").toUpperCase();
 
+  // Check if payment/shipping are NOT_APPLICABLE
+  const paymentNotApplicable = payment && payment.status === "NOT_APPLICABLE";
+  const shippingNotApplicable = shipping && shipping.status === "NOT_APPLICABLE";
+
   if (order) {
     const kind = toLabelKind(order.status);
     setSagaNode(sagaOrderNode, kind === "neutral" ? "ok" : kind, order.status || "Loaded");
@@ -240,16 +276,18 @@ function updateSagaLane(orderResult, paymentResult, shippingResult, notifyOrderR
   } else if (["PENDING", "INVENTORY_CHECKING"].includes(orderStatus)) {
     setSagaNode(sagaInventoryNode, "warn", "Checking stock");
   } else if (orderStatus === "CANCELLED") {
-    setSagaNode(sagaInventoryNode, "error", "Reservation cancelled");
+    setSagaNode(sagaInventoryNode, "error", "Reservation failed");
   } else if (orderStatus === "FAILED") {
-    setSagaNode(sagaInventoryNode, "warn", "Compensation applied");
+    setSagaNode(sagaInventoryNode, "error", "Reservation failed");
   } else {
     setSagaNode(sagaInventoryNode, "ok", "Inventory reserved");
   }
 
   if (payment) {
     const paymentStatus = String(payment.status || "").toUpperCase();
-    if (paymentStatus === "COMPLETED") {
+    if (paymentStatus === "NOT_APPLICABLE") {
+      setSagaNode(sagaPaymentNode, "neutral", "Skipped — order not completed");
+    } else if (paymentStatus === "COMPLETED") {
       setSagaNode(sagaPaymentNode, "ok", "Payment completed");
     } else if (paymentStatus === "FAILED") {
       setSagaNode(sagaPaymentNode, "error", "Payment failed");
@@ -259,19 +297,26 @@ function updateSagaLane(orderResult, paymentResult, shippingResult, notifyOrderR
   } else if (["INVENTORY_CHECKING", "INVENTORY_RESERVED", "PAYMENT_PROCESSING"].includes(orderStatus)) {
     setSagaNode(sagaPaymentNode, "warn", "Awaiting payment event");
   } else if (["FAILED", "CANCELLED"].includes(orderStatus)) {
-    setSagaNode(sagaPaymentNode, "warn", "No payment record");
+    setSagaNode(sagaPaymentNode, "neutral", "Skipped — order not completed");
   } else {
     setSagaNode(sagaPaymentNode, "wait", "Pending payment event");
   }
 
   if (shipping) {
-    setSagaNode(sagaShippingNode, "ok", shipping.status || "Shipment created");
+    const shippingStatus = String(shipping.status || "").toUpperCase();
+    if (shippingStatus === "NOT_APPLICABLE") {
+      setSagaNode(sagaShippingNode, "neutral", "Skipped — order not completed");
+    } else {
+      setSagaNode(sagaShippingNode, "ok", shipping.status || "Shipment created");
+    }
   } else if (payment && String(payment.status || "").toUpperCase() === "COMPLETED") {
     setSagaNode(sagaShippingNode, "warn", "Waiting for shipping event");
-  } else if (payment && String(payment.status || "").toUpperCase() === "FAILED") {
-    setSagaNode(sagaShippingNode, "warn", "Skipped after payment failure");
+  } else if (paymentNotApplicable || (payment && String(payment.status || "").toUpperCase() === "FAILED")) {
+    setSagaNode(sagaShippingNode, "neutral", "Skipped — order not completed");
   } else if (["SHIPPED", "COMPLETED"].includes(orderStatus)) {
     setSagaNode(sagaShippingNode, "error", "Shipment record missing");
+  } else if (["FAILED", "CANCELLED"].includes(orderStatus)) {
+    setSagaNode(sagaShippingNode, "neutral", "Skipped — order not completed");
   } else {
     setSagaNode(sagaShippingNode, "wait", "Pending shipment event");
   }
@@ -572,4 +617,188 @@ setEmptyCard(flowNotifyOrderView, "No data");
 setEmptyCard(flowNotifyCustomerView, "No data");
 
 loadInventory();
+
+// ============================================
+// Section 5: Cache Monitoring Functions
+// ============================================
+
+function showMessage(elementId, message, type) {
+  const element = document.getElementById(elementId);
+  element.textContent = message;
+  element.className = `status-message ${type}`;
+}
+
+function renderCacheCard(cacheName, cacheData) {
+  const cacheSize = cacheData.size || 0;
+  const cacheKeys = cacheData.keys || [];
+  
+  let html = `
+    <div class="cache-info-item">
+      <span class="cache-info-label">${cacheSize} entries</span>
+      <span class="cache-info-value">${cacheName}</span>
+    </div>
+    <div class="cache-info-item">
+      <span class="cache-info-label">Cache Size</span>
+      <span class="cache-info-value">${cacheSize}</span>
+    </div>
+    <div class="cache-info-item">
+      <span class="cache-info-label">Total Keys</span>
+      <span class="cache-info-value">${cacheKeys.length}</span>
+    </div>
+  `;
+  
+  if (cacheKeys.length > 0) {
+    html += `
+      <div class="cache-info-item">
+        <span class="cache-info-label">Keys:</span>
+      </div>
+      <div class="cache-keys">${cacheKeys.join('<br>')}</div>
+    `;
+  } else {
+    html += `
+      <div class="cache-info-item">
+        <span class="cache-info-label">Keys: No entries</span>
+      </div>
+    `;
+  }
+  
+  return html;
+}
+
+async function loadCacheStats() {
+  try {
+    const response = await fetch(`${API_PREFIX}/api/shipping/cache/stats`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Update Shipments Cache
+    const shipmentsCache = data.shipments || { size: 0, keys: [] };
+    document.getElementById('shipments-cache-info').innerHTML = 
+      renderCacheCard('shipments', shipmentsCache);
+    
+    // Update Shipments By Order Cache
+    const shipmentsByOrderCache = data.shipmentsByOrder || { size: 0, keys: [] };
+    document.getElementById('shipments-by-order-cache-info').innerHTML = 
+      renderCacheCard('shipmentsByOrder', shipmentsByOrderCache);
+    
+    // Calculate total entries
+    const totalEntries = shipmentsCache.size + shipmentsByOrderCache.size;
+    
+    showMessage('cache-message', 
+      `Cache stats loaded. Total entries: ${totalEntries}`, 
+      'success');
+  } catch (error) {
+    console.error('Error loading cache stats:', error);
+    showMessage('cache-message', 
+      `Error loading cache stats: ${error.message}`, 
+      'error');
+  }
+}
+
+async function clearAllCaches() {
+  try {
+    const response = await fetch(`${API_PREFIX}/api/shipping/cache/clear`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    showMessage('cache-message', 
+      `${data.message}. Cleared: ${data.clearedCaches}`, 
+      'success');
+    
+    // Reload cache stats
+    await loadCacheStats();
+  } catch (error) {
+    console.error('Error clearing caches:', error);
+    showMessage('cache-message', 
+      `Error clearing caches: ${error.message}`, 
+      'error');
+  }
+}
+
+// ============================================
+// Section 6: Shipment Status Check Functions
+// ============================================
+
+async function checkShipmentStatus() {
+  const shipmentId = document.getElementById('shipment-uuid').value.trim();
+  
+  if (!shipmentId) {
+    showMessage('shipment-message', 'Please enter a shipment UUID', 'error');
+    return;
+  }
+  
+  try {
+    // Measure response time
+    const startTime = performance.now();
+    
+    const response = await fetch(`${API_PREFIX}/api/shipping/${shipmentId}`);
+    
+    const endTime = performance.now();
+    const responseTime = (endTime - startTime).toFixed(2);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const shipment = await response.json();
+    
+    // Display shipment details
+    let html = `
+      <div class="shipment-detail-item">
+        <span class="shipment-detail-label">Shipment ID:</span>
+        <span class="shipment-detail-value">${escapeHtml(shipment.id)}</span>
+      </div>
+      <div class="shipment-detail-item">
+        <span class="shipment-detail-label">Order ID:</span>
+        <span class="shipment-detail-value">${escapeHtml(shipment.orderId)}</span>
+      </div>
+      <div class="shipment-detail-item">
+        <span class="shipment-detail-label">Status:</span>
+        <span class="shipment-detail-value">${escapeHtml(shipment.status)}</span>
+      </div>
+      <div class="shipment-detail-item">
+        <span class="shipment-detail-label">Tracking Number:</span>
+        <span class="shipment-detail-value">${escapeHtml(shipment.trackingNumber || 'N/A')}</span>
+      </div>
+      <div class="response-time">
+        ⚡ Response Time: ${responseTime}ms
+        ${responseTime < 50 ? ' (Cache Hit!)' : ' (Database Query)'}
+      </div>
+    `;
+    
+    document.getElementById('shipment-info').innerHTML = html;
+    
+    showMessage('shipment-message', 
+      `Shipment loaded in ${responseTime}ms`, 
+      'success');
+    
+    // Reload cache stats to show updated cache
+    await loadCacheStats();
+  } catch (error) {
+    console.error('Error checking shipment:', error);
+    showMessage('shipment-message', 
+      `Error: ${error.message}`, 
+      'error');
+    document.getElementById('shipment-info').innerHTML = 
+      '<p>Error loading shipment details.</p>';
+  }
+}
+
+// ============================================
+// Event Listeners for Cache Functions
+// ============================================
+
+document.getElementById('refresh-cache-btn').addEventListener('click', loadCacheStats);
+document.getElementById('clear-cache-btn').addEventListener('click', clearAllCaches);
+document.getElementById('check-status-btn').addEventListener('click', checkShipmentStatus);
 checkGatewayHealth();

@@ -8,6 +8,8 @@ import com.hacisimsek.shipping.repository.ShipmentRepository;
 import com.hacisimsek.shipping.service.ShippingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class ShippingServiceImpl implements ShippingService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"shipments", "shipmentsByOrder"}, allEntries = true)
     public void processShipping(PaymentProcessedEvent paymentEvent) {
         log.info("Processing shipping for order: {}", paymentEvent.getOrderId());
 
@@ -84,12 +87,14 @@ public class ShippingServiceImpl implements ShippingService {
     }
 
     @Override
+    @Cacheable(value = "shipmentsByOrder", key = "#orderId")
     public Shipment getShipmentByOrderId(UUID orderId) {
         return shipmentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Shipment not found for order: " + orderId));
     }
 
     @Override
+    @Cacheable(value = "shipments", key = "#shipmentId")
     public Shipment getShipmentById(UUID shipmentId) {
         return shipmentRepository.findById(shipmentId)
                 .orElseThrow(() -> new RuntimeException("Shipment not found with ID: " + shipmentId));
