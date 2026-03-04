@@ -1,5 +1,6 @@
 ## Step 0: Setup Project
 1. Fork this repository using your **private** github account. Ensure it's on your account after forked.
+2. Clone your forked project to your laptop.
 3. Download podman from `https://podman.io/`. If you don't have.
 4. Go to settings of podman and setup podman machine to have at least 4 CPUs and 8 GB RAM.
 5. Run compose command as below
