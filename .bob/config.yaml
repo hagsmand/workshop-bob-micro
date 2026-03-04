@@ -1,0 +1,68 @@
+auto_update: false
+installed_skills:
+- category: document
+  description: Create, edit, and analyze Word documents (.docx files)
+  license: Proprietary
+  name: docx
+- category: document
+  description: PDF manipulation and extraction
+  license: Proprietary
+  name: pdf
+- category: document
+  description: Excel spreadsheet operations
+  license: Proprietary
+  name: xlsx
+- category: document
+  description: PowerPoint presentation creation
+  license: Proprietary
+  name: pptx
+- category: development
+  description: Build Model Context Protocol servers
+  license: Apache-2.0
+  name: mcp-builder
+- category: creative
+  description: Generate algorithmic art using p5.js
+  license: Apache-2.0
+  name: algorithmic-art
+- category: creative
+  description: Create visual designs and posters
+  license: Apache-2.0
+  name: canvas-design
+- category: document
+  description: Collaborative document editing workflows
+  license: Apache-2.0
+  name: doc-coauthoring
+- category: development
+  description: Build frontend interfaces and web components
+  license: Apache-2.0
+  name: frontend-design
+- category: enterprise
+  description: Internal communications templates
+  license: Apache-2.0
+  name: internal-comms
+- category: utility
+  description: Create new custom skills
+  license: Apache-2.0
+  name: skill-creator
+- category: creative
+  description: Create animated GIFs for Slack
+  license: Apache-2.0
+  name: slack-gif-creator
+- category: creative
+  description: Generate design themes
+  license: Apache-2.0
+  name: theme-factory
+- category: development
+  description: Create web artifacts and components
+  license: Apache-2.0
+  name: web-artifacts-builder
+- category: development
+  description: Test web applications with Playwright
+  license: Apache-2.0
+  name: webapp-testing
+- category: enterprise
+  description: Brand consistency enforcement
+  license: Apache-2.0
+  name: brand-guidelines
+skill_source: https://github.com/anthropics/skills
+version: 1.0.0

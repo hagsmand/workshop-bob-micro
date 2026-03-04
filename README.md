@@ -1,14 +1,14 @@
 # E-commerce Microservices with Saga Pattern
 
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
 ![Java](https://img.shields.io/badge/Java-17-orange.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.12-green.svg)
-![Last Updated](https://img.shields.io/badge/last%20updated-2026--02--27-brightgreen.svg)
+![Last Updated](https://img.shields.io/badge/last%20updated-2026--03--04-brightgreen.svg)
 
 A professional implementation of an e-commerce system using microservice architecture with Saga pattern for distributed transaction management.
 
-*Created by: hacisimsek*  
-*Last Updated: 2025-05-26 18:40:03*
+*Created by: hacisimsek*
+*Last Updated: 2026-03-04*
 
 ## Table of Contents
 
@@ -17,6 +17,7 @@ A professional implementation of an e-commerce system using microservice archite
 - [Microservices](#microservices)
 - [Technologies](#technologies)
 - [Saga Pattern Implementation](#saga-pattern-implementation)
+- [Error Handling & User Experience](#error-handling--user-experience)
 - [Project Structure](#project-structure)
 - [Setup Instructions](#setup-instructions)
 - [API Documentation](#api-documentation)
@@ -26,6 +27,15 @@ A professional implementation of an e-commerce system using microservice archite
 ## Overview
 
 This project implements a robust e-commerce system using a microservices architecture. The system handles order processing, inventory management, payment processing, shipping logistics, and customer notifications while maintaining data consistency across distributed services through the Saga pattern.
+
+### Key Features
+
+- **Saga Pattern**: Distributed transaction management with compensation
+- **Graceful Error Handling**: User-friendly responses for business logic failures (v1.4.0)
+- **Event-Driven Architecture**: Kafka-based asynchronous communication
+- **Service Discovery**: Eureka for dynamic service registration
+- **API Gateway**: Centralized routing and load balancing
+- **Monitoring Tools**: Kafka UI and pgAdmin for observability
 
 ## Architecture
 
@@ -410,6 +420,52 @@ graph TB
 - **Inventory Reservation Failure** → Order cancelled immediately
 - **Payment Failure** → Inventory released, order marked as failed
 - **Shipping Failure** → Payment refunded, inventory released, order marked as failed
+
+
+## Error Handling & User Experience
+
+### Graceful Out-of-Stock Handling (v1.4.0)
+
+The system implements graceful error handling for scenarios where orders fail due to business logic constraints (e.g., insufficient inventory). Instead of returning HTTP 500 errors, the system provides user-friendly responses that clearly explain the situation.
+
+#### Key Features
+
+- **HTTP 200 Responses**: Payment and Shipping services return HTTP 200 with `NOT_APPLICABLE` status when no records exist due to upstream failures
+- **Clear Messaging**: Descriptive messages explain why services were not invoked
+- **Visual Feedback**: Frontend displays neutral badges and informative messages instead of error cards
+- **Saga Visualization**: Enhanced saga lane rendering shows:
+  - Red/error state for the actual failure point (e.g., inventory)
+  - Neutral/grey state for skipped services (payment, shipping)
+  - Clear distinction between system errors and expected business outcomes
+
+#### Example Responses
+
+**Payment Service - NOT_APPLICABLE Response:**
+```json
+{
+  "status": "NOT_APPLICABLE",
+  "message": "Order was not completed — no payment was processed. This may be due to insufficient inventory stock.",
+  "orderId": "uuid"
+}
+```
+
+**Shipping Service - NOT_APPLICABLE Response:**
+```json
+{
+  "status": "NOT_APPLICABLE",
+  "message": "Order was not completed — no shipment was created. This may be due to insufficient inventory stock or payment failure.",
+  "orderId": "uuid"
+}
+```
+
+#### Benefits
+
+- **Better UX**: Users understand what happened and why
+- **Reduced Confusion**: No misleading HTTP 500 errors for expected business scenarios
+- **Improved Observability**: Clear distinction between technical failures and business logic outcomes
+- **Consistent API Design**: Follows REST best practices for representing business states
+
+For detailed implementation information, see [`GRACEFUL_HANDLING_IMPLEMENTATION.md`](GRACEFUL_HANDLING_IMPLEMENTATION.md).
 
 ## Code Architecture & Design Patterns
 
@@ -1122,12 +1178,61 @@ GET /api/inventory/check?productId={productId}&quantity={quantity}
 GET /api/payments/order/{orderId}
 ```
 
+**Success Response (Payment exists):**
+```json
+{
+  "id": "uuid",
+  "orderId": "uuid",
+  "customerId": "uuid",
+  "amount": 100.00,
+  "status": "COMPLETED",
+  "paymentMethod": "CREDIT_CARD",
+  "transactionId": "TXN-12345678"
+}
+```
+
+**Success Response (Payment not applicable - order failed before payment):**
+```json
+{
+  "status": "NOT_APPLICABLE",
+  "message": "Order was not completed — no payment was processed. This may be due to insufficient inventory stock.",
+  "orderId": "uuid"
+}
+```
+
+**Note:** Both responses return HTTP 200. The `NOT_APPLICABLE` status indicates the order failed before reaching the payment stage (typically due to inventory shortage).
+
 ### Shipping Service
 
 #### Get Shipment by Order ID
 ```
 GET /api/shipping/order/{orderId}
 ```
+
+**Success Response (Shipment exists):**
+```json
+{
+  "id": "uuid",
+  "orderId": "uuid",
+  "customerId": "uuid",
+  "status": "SHIPPED",
+  "carrierName": "DHL",
+  "trackingNumber": "AB123456789CD",
+  "shippingAddress": "123 Main St, New York, NY 10001",
+  "recipientName": "John Doe"
+}
+```
+
+**Success Response (Shipment not applicable - order failed before shipping):**
+```json
+{
+  "status": "NOT_APPLICABLE",
+  "message": "Order was not completed — no shipment was created. This may be due to insufficient inventory stock or payment failure.",
+  "orderId": "uuid"
+}
+```
+
+**Note:** Both responses return HTTP 200. The `NOT_APPLICABLE` status indicates the order failed before reaching the shipping stage (due to inventory shortage or payment failure).
 
 ### Notification Service
 

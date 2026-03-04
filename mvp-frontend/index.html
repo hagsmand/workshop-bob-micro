@@ -177,6 +177,57 @@
       </form>
       <div id="availability-feedback" class="status status-neutral">Ready.</div>
     </section>
+
+    <!-- Section 5: Shipping Cache Monitor -->
+    <section id="cache-card" class="card">
+      <h2>5) Shipping Cache Monitor</h2>
+      <p>Monitor cache performance to verify the fix is working. Cache reduces CPU load by storing frequently accessed data.</p>
+      
+      <div class="button-group">
+        <button id="refresh-cache-btn" class="btn btn-primary">Refresh Cache Stats</button>
+        <button id="clear-cache-btn" class="btn btn-secondary">Clear All Caches</button>
+      </div>
+
+      <div class="cache-stats">
+        <div class="cache-section">
+          <h3>Shipments Cache</h3>
+          <div id="shipments-cache-info">
+            <p>No data</p>
+          </div>
+        </div>
+
+        <div class="cache-section">
+          <h3>Shipments By Order Cache</h3>
+          <div id="shipments-by-order-cache-info">
+            <p>No data</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="cache-message" class="status-message"></div>
+    </section>
+
+    <!-- Section 6: Check Shipment Status -->
+    <section id="shipment-check-card" class="card">
+      <h2>6) Check Shipment Status</h2>
+      <p>Query shipment status to test cache performance. Repeated queries will hit the cache.</p>
+      
+      <div class="form-group">
+        <label for="shipment-uuid">Shipment UUID</label>
+        <input type="text" id="shipment-uuid" placeholder="Paste shipment ID">
+      </div>
+
+      <button id="check-status-btn" class="btn btn-primary">Check Status</button>
+
+      <div id="shipment-details">
+        <h3>Shipment Details</h3>
+        <div id="shipment-info">
+          <p>No shipment checked yet.</p>
+        </div>
+      </div>
+
+      <div id="shipment-message" class="status-message"></div>
+    </section>
   </main>
 
   <footer class="footer">

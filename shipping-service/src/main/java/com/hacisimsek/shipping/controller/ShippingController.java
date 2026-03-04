@@ -1,5 +1,6 @@
 package com.hacisimsek.shipping.controller;
 
+import com.hacisimsek.shipping.dto.ShipmentNotApplicableResponse;
 import com.hacisimsek.shipping.model.Shipment;
 import com.hacisimsek.shipping.service.ShippingService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,18 @@ public class ShippingController {
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<Shipment> getShipmentByOrderId(@PathVariable UUID orderId) {
-        return ResponseEntity.ok(shippingService.getShipmentByOrderId(orderId));
+    public ResponseEntity<?> getShipmentByOrderId(@PathVariable UUID orderId) {
+        try {
+            Shipment shipment = shippingService.getShipmentByOrderId(orderId);
+            return ResponseEntity.ok(shipment);
+        } catch (RuntimeException e) {
+            // Shipment not found - order was not completed (likely due to inventory or payment failure)
+            ShipmentNotApplicableResponse response = ShipmentNotApplicableResponse.builder()
+                    .status("NOT_APPLICABLE")
+                    .message("Order was not completed — no shipment was created. This may be due to insufficient inventory stock or payment failure.")
+                    .orderId(orderId)
+                    .build();
+            return ResponseEntity.ok(response);
+        }
     }
 }
